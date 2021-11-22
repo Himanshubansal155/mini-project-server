@@ -10,7 +10,7 @@ exports.create = async (req, res) => {
     res.json(newProduct);
   } catch (err) {
     console.log(err);
-    // res.status(400).send("Create product failed");
+
     res.status(400).json({
       err: err.message,
     });
@@ -67,29 +67,8 @@ exports.update = async (req, res) => {
   }
 };
 
-// WITHOUT PAGINATION
-// exports.list = async (req, res) => {
-//   try {
-//     // createdAt/updatedAt, desc/asc, 3
-//     const { sort, order, limit } = req.body;
-//     const products = await Product.find({})
-//       .populate("category")
-//       .populate("subs")
-//       .sort([[sort, order]])
-//       .limit(limit)
-//       .exec();
-
-//     res.json(products);
-//   } catch (err) {
-//     console.log(err);
-//   }
-// };
-
-// WITH PAGINATION
 exports.list = async (req, res) => {
-  // console.table(req.body);
   try {
-    // createdAt/updatedAt, desc/asc, 3
     const { sort, order, page } = req.body;
     const currentPage = page || 1;
     const perPage = 3; // 3
@@ -118,13 +97,10 @@ exports.productStar = async (req, res) => {
   const user = await User.findOne({ email: req.user.email }).exec();
   const { star } = req.body;
 
-  // who is updating?
-  // check if currently logged in user have already added rating to this product?
   let existingRatingObject = product.ratings.find(
     (ele) => ele.postedBy.toString() === user._id.toString()
   );
 
-  // if user haven't left rating yet, push it
   if (existingRatingObject === undefined) {
     let ratingAdded = await Product.findByIdAndUpdate(
       product._id,
@@ -136,7 +112,6 @@ exports.productStar = async (req, res) => {
     console.log("ratingAdded", ratingAdded);
     res.json(ratingAdded);
   } else {
-    // if user have already left rating, update it
     const ratingUpdated = await Product.updateOne(
       {
         ratings: { $elemMatch: existingRatingObject },
@@ -278,16 +253,8 @@ const handleBrand = async (req, res, brand) => {
 };
 
 exports.searchFilters = async (req, res) => {
-  const {
-    query,
-    price,
-    category,
-    stars,
-    sub,
-    shipping,
-    color,
-    brand,
-  } = req.body;
+  const { query, price, category, stars, sub, shipping, color, brand } =
+    req.body;
 
   if (query) {
     console.log("query --->", query);
