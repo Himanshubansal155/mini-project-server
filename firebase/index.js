@@ -8,5 +8,4 @@ admin.initializeApp({
 
 module.exports = admin;
 
-
 var admin = require("firebase-admin");
